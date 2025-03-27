@@ -617,39 +617,6 @@ echo "Dựa trên ${predevice}_${buildincremental} để xây dựng chuyển đ
 echo "Sử dụng gói nền ${predevice_n}_${buildincremental_n}" >> "$GITHUB_WORKSPACE"/file.log
 echo "Tên gói là $rom_name" >> "$GITHUB_WORKSPACE"/file.log
 
-# Đường dẫn đến tệp ROM đã tạo
-ROM_FILE="$GITHUB_WORKSPACE/zip/${rom_name}"
-
-# URL API của Gofile.io
-GOFILE_API_URL="https://store1.gofile.io/uploadFile"
-
-# Hàm để tải tệp lên Gofile
-upload_to_gofile() {
-  echo -e "\e[1;33m - Bắt đầu tải ${rom_name} lên Gofile.io \e[0m"
-  Start_Time
-
-  # Sử dụng curl để tải tệp lên Gofile.io
-  response=$(curl -s -F "file=@${ROM_FILE}" "${GOFILE_API_URL}")
-
-  # Kiểm tra phản hồi từ Gofile
-  if echo "$response" | grep -q '"status":"ok"'; then
-    # Trích xuất URL tải xuống từ phản hồi JSON
-    download_url=$(echo "$response" | grep -o '"downloadPage":"[^"]*' | cut -d'"' -f4)
-    echo -e "\e[1;32m - Tải lên thành công! URL tải xuống: $download_url \e[0m"
-    
-    # Ghi URL vào file log và GITHUB_ENV để sử dụng sau
-    echo "URL tải xuống: $download_url" >> "$GITHUB_WORKSPACE/file.log"
-    echo "DOWNLOAD_URL=$download_url" >> "$GITHUB_ENV"
-  else
-    echo -e "\e[1;31m - Lỗi khi tải lên Gofile.io: $response \e[0m"
-    exit 1
-  fi
-
-  End_Time "Tải lên Gofile.io"
-}
-
-# Gọi hàm tải lên
-upload_to_gofile
 
 # Hiển thị thông tin cuối cùng
 echo -e "\e[1;34m - Quá trình hoàn tất! Tệp ${rom_name} đã được tải lên Gofile.io. \e[0m"
